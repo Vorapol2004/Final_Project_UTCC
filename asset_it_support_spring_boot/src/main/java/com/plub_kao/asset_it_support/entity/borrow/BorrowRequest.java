@@ -1,0 +1,23 @@
+package com.plub_kao.asset_it_support.entity.borrow;
+
+import com.plub_kao.asset_it_support.entity.employee.Employee;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Getter
+@Setter
+public class BorrowRequest {
+
+
+    private Integer employeeId;
+    private String referenceDoc;
+    private LocalDate borrowDate;
+    private LocalDate dueDate;
+    private String approverName;
+    private List<Integer> equipmentIds;
+
+
+}

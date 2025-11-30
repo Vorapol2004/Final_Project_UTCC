@@ -58,3 +58,8 @@ Thumbs.db
 # Logs
 *.log
 
+# Database files (keep local, don't commit)
+*.sql
+!**/mysql-init/*.sql
+db_asset.sql
+

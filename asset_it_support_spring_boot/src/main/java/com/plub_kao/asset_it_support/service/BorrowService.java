@@ -16,8 +16,6 @@ import com.plub_kao.asset_it_support.entity.equipmentStatus.EquipmentStatus;
 import com.plub_kao.asset_it_support.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.query.Param;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,12 +41,20 @@ public class BorrowService {
     private final BorrowEquipmentRepository borrowEquipmentRepository;
 
 
+    /**
+     * อัปเดตสถานะการยืมเป็น 'เกินกำหนด' (Run on Demand)
+     * สำหรับรายการที่ due_date < วันปัจจุบัน และยังไม่ได้คืน
+     * ถูกเรียกอัตโนมัติเมื่อเรียก API /borrow/all หรือเรียกโดยตรงผ่าน /borrow/update-overdue
+     */
     @Transactional
     public void updateOverdueBorrowStatus() {
-
-        System.out.println(">>> Running scheduled updateOverdueBorrowStatus()");
-        borrowRepository.updateOverdueStatus();
-        System.out.println(">>> Finished scheduled update");
+        log.info(">>> Running updateOverdueBorrowStatus()");
+        try {
+            borrowRepository.updateOverdueStatus();
+            log.info(">>> Finished update - Overdue status updated successfully");
+        } catch (Exception e) {
+            log.error(">>> Error updating overdue status: {}", e.getMessage(), e);
+        }
     }
 
     @Transactional

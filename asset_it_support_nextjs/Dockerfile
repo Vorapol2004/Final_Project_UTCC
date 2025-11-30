@@ -37,6 +37,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
+# Note: If .next/standalone doesn't exist, the build might need adjustment
+# Make sure next.config.ts has output: 'standalone'
+
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
 

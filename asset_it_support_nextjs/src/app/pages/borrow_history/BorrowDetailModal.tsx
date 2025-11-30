@@ -16,6 +16,7 @@ import {
     CheckCircle,
     ChevronDown,
 } from 'lucide-react';
+import { getEquipmentTypeColor } from '@/utils/statusColors';
 
 type GroupedBorrow = import('@/types/type').BorrowView;
 
@@ -160,11 +161,7 @@ export function BorrowDetailModal({
                                                 ) : (
                                                     <Key className="h-4 w-4 text-purple-600" />
                                                 )}
-                                                <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                    item.equipmentTypeName?.toLowerCase() === 'hardware'
-                                                        ? 'bg-blue-100 text-blue-800'
-                                                        : 'bg-purple-100 text-purple-800'
-                                                }`}>
+                                                <span className={`px-2 py-1 rounded text-xs font-semibold ${getEquipmentTypeColor(item.equipmentTypeName)}`}>
                                                     {item.equipmentTypeName}
                                                 </span>
                                             </div>

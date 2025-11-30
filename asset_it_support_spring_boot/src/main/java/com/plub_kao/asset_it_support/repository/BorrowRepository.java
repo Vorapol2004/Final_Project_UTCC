@@ -438,15 +438,17 @@ public interface BorrowRepository extends JpaRepository<Borrow, Integer> {
 
 
     //check due_date < current  borrowed change overdue
+    // อัปเดต borrow status เป็น 'เกินกำหนด' เมื่อ due_date < วันปัจจุบัน และ status ปัจจุบันเป็น 'ยืม'
     @Modifying
     @Transactional
     @Query(value = """
              UPDATE borrow b
              INNER JOIN borrow_equipment be ON be.borrow_id = b.id
-             INNER JOIN borrow_status bs_overdue ON bs_overdue.borrow_status_name = 'overdue'
-             INNER JOIN borrow_status bs_borrowed ON bs_borrowed.borrow_status_name = 'borrowed'
+             INNER JOIN borrow_status bs_overdue ON bs_overdue.borrow_status_name = 'เกินกำหนด'
+             INNER JOIN borrow_status bs_borrowed ON bs_borrowed.borrow_status_name = 'ยืม'
              SET b.borrow_status_id = bs_overdue.id
              WHERE be.due_date < CURDATE()
+               AND be.return_date IS NULL
                AND b.borrow_status_id = bs_borrowed.id;
             """, nativeQuery = true)
     void updateOverdueStatus();

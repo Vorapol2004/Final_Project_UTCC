@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: asset-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-project2025}
+      MYSQL_DATABASE: db_asset
+      MYSQL_USER: ${MYSQL_USER:-asset_utcc}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-project2025}
+    ports:
+      - "${MYSQL_PORT:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-project2025}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot Backend
+  spring-boot:
+    build:
+      context: ./asset_it_support_spring_boot
+      dockerfile: Dockerfile
+    container_name: asset-spring-boot
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_USER: ${MYSQL_USER:-asset_utcc}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-project2025}
+      JWT_SECRET: ${JWT_SECRET:-THIS_IS_A_VERY_STRONG_SECRET_KEY_AT_LEAST_32_CHARS}
+    ports:
+      - "${SPRING_BOOT_PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Next.js Frontend
+  nextjs:
+    build:
+      context: ./asset_it_support_nextjs
+      dockerfile: Dockerfile
+    container_name: asset-nextjs
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      # Use service name for internal communication, localhost for browser
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    ports:
+      - "${NEXTJS_PORT:-3000}:3000"
+    depends_on:
+      spring-boot:
+        condition: service_healthy
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
+

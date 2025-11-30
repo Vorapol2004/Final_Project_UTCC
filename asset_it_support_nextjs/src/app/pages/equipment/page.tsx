@@ -9,6 +9,7 @@ import {
 import { useEquipment } from '@/hooks/useEquipment';
 import { EquipmentDetailModal } from './EquipmentDetailModal';
 import { EditEquipmentModal } from './EditEquipmentModal';
+import { getEquipmentStatusColor, getEquipmentTypeColor } from '@/utils/statusColors';
 
 export default function EquipmentPage() {
     const {
@@ -315,26 +316,12 @@ export default function EquipmentPage() {
                                                 )}
                                             </td>
                                             <td className="px-6 py-3">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                                    eq.equipmentTypeName === 'Hardware'
-                                                        ? 'bg-blue-100 text-blue-800'
-                                                        : 'bg-purple-100 text-purple-800'
-                                                }`}>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getEquipmentTypeColor(eq.equipmentTypeName)}`}>
                                                     {eq.equipmentTypeName}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-3">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                                    eq.equipmentStatusName === 'Available'
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : eq.equipmentStatusName === 'In Use'
-                                                            ? 'bg-blue-100 text-blue-800'
-                                                            : eq.equipmentStatusName === 'Under Maintenance'
-                                                                ? 'bg-yellow-100 text-yellow-800'
-                                                                : eq.equipmentStatusName === 'Damaged'
-                                                                    ? 'bg-red-100 text-red-800'
-                                                                    : 'bg-gray-100 text-gray-800'
-                                                }`}>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getEquipmentStatusColor(eq.equipmentStatusName)}`}>
                                                     {eq.equipmentStatusName}
                                                 </span>
                                             </td>
